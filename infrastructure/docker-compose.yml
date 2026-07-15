@@ -4,18 +4,18 @@ services:
   # Database
   db:
     image: postgres:15-alpine
-    container_name: hl-db
+    container_name: slfn-business-os-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: hl_user
-      POSTGRES_PASSWORD: hl_pass
-      POSTGRES_DB: hl_nexus
+      POSTGRES_USER: slfn
+      POSTGRES_PASSWORD: slfn-pass
+      POSTGRES_DB: slfn_business_os
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hl_user -d hl_nexus"]
+      test: ["CMD-SHELL", "pg_isready -U slfn -d slfn_business_os"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,19 +23,19 @@ services:
   # Redis
   redis:
     image: redis:7-alpine
-    container_name: hl-redis
+    container_name: slfn-business-os-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
 
-  # Backend API
+  # Backend API - REMAPPED to 8105 to avoid conflict with SLFN Nexus AI (8102/8103)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: hl-backend
+    container_name: slfn-business-os-backend
     restart: unless-stopped
     depends_on:
       db:
@@ -43,14 +43,13 @@ services:
       redis:
         condition: service_started
     environment:
-      - DATABASE_URL=postgresql://hl_user:hl_pass@db:5432/hl_nexus
+      - DATABASE_URL=postgresql://slfn:slfn-pass@db:5432/slfn_business_os
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=change-this-in-production
-      - ALCHEMY_KEY=sk-ant-apikey-placeholder
     volumes:
       - ./backend/app:/app/app
     ports:
-      - "8000:8000"
+      - "8105:8000"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   # Frontend
@@ -58,20 +57,20 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: hl-frontend
+    container_name: slfn-business-os-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8105
     ports:
-      - "3000:3000"
+      - "3001:3000"
     command: npm run dev -- --host 0.0.0.0 --port 3000
 
   # AI Service (optional - for local LLM)
   ai-service:
     image: ollama/ollama:latest
-    container_name: hl-ai
+    container_name: slfn-business-os-ai
     restart: unless-stopped
     ports:
       - "11434:11434"
@@ -91,7 +90,7 @@ services:
   # MinIO (S3-compatible storage)
   minio:
     image: minio/minio:latest
-    container_name: hl-minio
+    container_name: slfn-business-os-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     ports:
@@ -103,17 +102,17 @@ services:
     volumes:
       - minio_data:/data
 
-  # Nginx (reverse proxy)
+  # Nginx (reverse proxy - REMAPPED to avoid port 80 conflict)
   nginx:
     image: nginx:alpine
-    container_name: hl-nginx
+    container_name: slfn-business-os-nginx
     restart: unless-stopped
     depends_on:
       - frontend
       - backend
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     volumes:
       - ./infrastructure/nginx.conf:/etc/nginx/nginx.conf
       - ./infrastructure/certs:/etc/nginx/certs

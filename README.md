@@ -28,8 +28,8 @@ This project replicates the core functionality of HighLevel (https://www.gohighl
 
 ### Backend
 - **Framework**: FastAPI (Python 3.12)
-- **Database**: PostgreSQL + TimescaleDB
-- **Cache**: Redis
+- **Database**: PostgreSQL 15
+- **Cache**: Redis 7
 - **Auth**: JWT/OAuth2
 - **Real-time**: WebSocket
 
@@ -41,7 +41,7 @@ This project replicates the core functionality of HighLevel (https://www.gohighl
 
 ### AI Services
 - **Models**: Qwen2.5-Coder-1.5B (1.1GB)
-- **Inference**: llama.cpp / vLLM
+- **Inference**: Ollama
 - **Integration**: Local API
 
 ### Infrastructure
@@ -52,35 +52,28 @@ This project replicates the core functionality of HighLevel (https://www.gohighl
 ## Project Structure
 
 ```
-highlevel-clone/
+slfn-business-os/
 ├── backend/
-│   ├── app/
-│   │   ├── api/          # API endpoints
-│   │   ├── core/         # Core services
-│   │   ├── db/           # Database models
-│   │   ├── models/       # Pydantic models
-│   │   ├── services/     # Business logic
-│   │   └── utils/        # Utilities
-│   ├── tests/
+│   ├── app/                # API endpoints
+│   ├── migrations/          # Database migrations
+│   ├── tests/               # Test files
+│   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/
 │   ├── src/
-│   │   ├── components/   # React components
-│   │   ├── pages/        # Page components
-│   │   ├── hooks/        # Custom hooks
-│   │   ├── store/        # Zustand store
-│   │   └── types/        # TypeScript types
-│   ├── public/
-│   └── Dockerfile
-├── services/
-│   └── ai/               # AI service scripts
+│   ├── package.json
+│   └── vite.config.ts
 ├── infrastructure/
 │   ├── docker-compose.yml
 │   └── nginx.conf
 ├── docs/
 │   ├── PRD.md
+│   ├── ARCHITECTURE.md
+│   ├── QUICKSTART.md
 │   ├── ISSUES.md
-│   └── ARCHITECTURE.md
+│   └── VERIFICATION.md
+├── .env.example
+├── LICENSE                  # MIT License
 └── README.md
 ```
 
@@ -92,35 +85,39 @@ highlevel-clone/
 - Node.js 18+
 - Make (optional)
 
-### Quick Start
+### Quick Start (Docker)
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd highlevel-clone
+# Navigate to project
+cd slfn-business-os
 
 # Start all services
 docker-compose up -d
 
+# Wait for database to be ready (30-60 seconds)
+
 # Run database migrations
-docker-compose exec backend alembic upgrade head
+docker-compose exec backend python -m alembic upgrade head
 
 # Access the application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+# Frontend: http://localhost:3001
+# Backend API: http://localhost:8105
+# API Docs: http://localhost:8105/docs
+# Nginx: http://localhost:8080
 ```
 
-### Development Setup
+### Development Setup (Local)
 
 ```bash
 # Backend
 cd backend
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 
 # Frontend
-cd frontend
+cd ../frontend
 npm install
 npm run dev
 ```
@@ -129,22 +126,35 @@ npm run dev
 
 ### Backend (.env)
 ```
-DATABASE_URL=postgresql://user:pass@db:5432/nexus
-REDIS_URL=redis://redis:6379/0
-SECRET_KEY=your-secret-key
-ALGORITHMHS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+DATABASE_URL=postgresql://slfn:***@localhost:5432/slfn_business_os
+REDIS_URL=redis://localhost:6379/0
+SECRET_KEY=your-secret-key-here
 ```
 
 ### Frontend (.env)
 ```
-VITE_API_URL=http://localhost:8000
-VITE_WS_URL=ws://localhost:8000/ws
+VITE_API_URL=http://localhost:8105
+VITE_WS_URL=ws://localhost:8105/ws
 ```
 
 ## API Documentation
 
-Visit http://localhost:8000/docs when running locally for interactive API documentation.
+Visit http://localhost:8105/docs when running locally for interactive API documentation.
+
+## Ports Reference
+
+| Service | Container Port | Host Port |
+|---------|---------------|-----------|
+| Backend | 8000 | 8105 |
+| Frontend | 3000 | 3001 |
+| PostgreSQL | 5432 | 5432 |
+| Redis | 6379 | 6379 |
+| MinIO API | 9000 | 9000 |
+| MinIO Console | 9001 | 9001 |
+| Ollama AI | 11434 | 11434 |
+| Nginx | 80 | 8080 |
+
+Note: Backend port mapped to 8105 to avoid conflict with existing SLFN Nexus AI (ports 8102/8103).
 
 ## Contributing
 
