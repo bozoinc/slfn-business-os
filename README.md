@@ -1,4 +1,4 @@
-# SLFN Nexus Platform (HighLevel Clone)
+# SLFN Business OS (HighLevel Clone)
 
 An open-source, AI-powered business operating system - a FOSS alternative to HighLevel.
 
