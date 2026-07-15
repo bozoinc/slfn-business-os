@@ -55,8 +55,8 @@ This project replicates the core functionality of HighLevel (https://www.gohighl
 slfn-business-os/
 ├── backend/
 │   ├── app/                # API endpoints
-│   ├── migrations/          # Database migrations
-│   ├── tests/               # Test files
+│   ├── migrations/         # Database migrations
+│   ├── tests/              # Test files
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/
@@ -67,11 +67,11 @@ slfn-business-os/
 │   ├── docker-compose.yml
 │   └── nginx.conf
 ├── docs/
-│   ├── PRD.md
-│   ├── ARCHITECTURE.md
-│   ├── QUICKSTART.md
-│   ├── ISSUES.md
-│   └── VERIFICATION.md
+│   ├── PRD.md              # Product Requirements
+│   ├── ARCHITECTURE.md     # System design
+│   ├── QUICKSTART.md       # Quick start guide
+│   ├── ISSUES.md           # Issue tracker
+│   └── VERIFICATION.md     # This file
 ├── .env.example
 ├── LICENSE                  # MIT License
 └── README.md
@@ -100,10 +100,10 @@ docker-compose up -d
 docker-compose exec backend python -m alembic upgrade head
 
 # Access the application
-# Frontend: http://localhost:3001
-# Backend API: http://localhost:8105
-# API Docs: http://localhost:8105/docs
-# Nginx: http://localhost:8080
+# Frontend: http://localhost:3002
+# Backend API: http://localhost:8081
+# API Docs: http://localhost:8081/docs
+# Nginx: http://localhost:8082
 ```
 
 ### Development Setup (Local)
@@ -133,28 +133,30 @@ SECRET_KEY=your-secret-key-here
 
 ### Frontend (.env)
 ```
-VITE_API_URL=http://localhost:8105
-VITE_WS_URL=ws://localhost:8105/ws
+VITE_API_URL=http://localhost:8081
+VITE_WS_URL=ws://localhost:8081/ws
 ```
 
 ## API Documentation
 
-Visit http://localhost:8105/docs when running locally for interactive API documentation.
+Visit http://localhost:8081/docs when running locally for interactive API documentation.
 
 ## Ports Reference
 
 | Service | Container Port | Host Port |
 |---------|---------------|-----------|
-| Backend | 8000 | 8105 |
-| Frontend | 3000 | 3001 |
+| Backend | 8000 | 8081 |
+| Frontend | 3000 | 3002 |
 | PostgreSQL | 5432 | 5432 |
 | Redis | 6379 | 6379 |
-| MinIO API | 9000 | 9000 |
-| MinIO Console | 9001 | 9001 |
-| Ollama AI | 11434 | 11434 |
-| Nginx | 80 | 8080 |
+| MinIO API | 9000 | 9002 |
+| MinIO Console | 9001 | 9003 |
+| Nginx | 80 | 8082 |
 
-Note: Backend port mapped to 8105 to avoid conflict with existing SLFN Nexus AI (ports 8102/8103).
+**Note**: Ports remapped to avoid conflicts:
+- Backend 8081: Avoids llama-server (8000) and SLFN Nexus AI (8102/8103)
+- Frontend 3002: Avoids conflicts with other services
+- MinIO 9002/9003: Avoids conflicts
 
 ## Contributing
 

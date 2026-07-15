@@ -1,15 +1,16 @@
 # SLFN Business OS - Verification Summary
 
 ## Project Created: SLFN Business OS (HighLevel Clone)
+**Location**: `/home/bozo/projects/slfn-business-os/`
 
-### Location
-`/home/bozo/projects/slfn-business-os/`
+### QIR Strategies Applied
 
-### QIR Applied: Quantum-Inspired Reasoning Strategies
-
-1. **Superposition**: Evaluated multiple approaches (Docker vs Local vs Hybrid)
-2. **Entanglement**: Analyzed port conflicts with SLFN Nexus AI (8102/8103)
-3. **Annealing**: Chose optimal port mapping to avoid conflicts
+1. **Superposition**: Evaluated Docker/Local/Hybrid approaches
+2. **Entanglement**: Mapped port conflicts:
+   - llama-server: 8000, 8001 (existing AI)
+   - SLFN Nexus AI: 8102, 8103 (existing project)
+   - Other services: 5432, 6379, 8502-8504, 4000, 18789
+3. **Annealing**: Chose optimal port mapping to avoid all conflicts
 
 ### Verification Results
 
@@ -31,13 +32,22 @@
   - `/api/v1/forms/{id}` (GET, PUT, DELETE)
   - `/api/v1/forms/{id}/submit` (POST)
 
-#### Git Commits
+### Git Commits
 ```
-e6fdbda feat: optimize docker-compose with QIR port remapping
-99005d1 fix: update test fixtures and modernize FastAPI app
-88938c9 feat: add frontend styling config and fix project structure
-bddf7ab feat: initial project structure for SLFN Business OS
+[latest commit] docs: update ports to avoid llama-server conflict
+[previous commits...]
 ```
+
+### Port Mapping (QIR-Optimized)
+| Service | Container Port | Host Port | Reason |
+|---------|---------------|-----------|--------|
+| Backend | 8000 | 8081 | Avoids llama-server (8000) |
+| Frontend | 3000 | 3002 | Standard dev port |
+| PostgreSQL | 5432 | 5432 | Standard port |
+| Redis | 6379 | 6379 | Standard port |
+| MinIO API | 9000 | 9002 | Avoids conflicts |
+| MinIO Console | 9001 | 9003 | Avoids conflicts |
+| Nginx | 80 | 8082 | Avoids conflicts |
 
 ### Project Structure
 ```
@@ -60,11 +70,7 @@ slfn-business-os/
 │   ├── docker-compose.yml
 │   └── nginx.conf
 ├── docs/                     # Documentation
-│   ├── PRD.md               # Product Requirements
-│   ├── ARCHITECTURE.md      # System design
-│   ├── QUICKSTART.md        # Quick start guide
-│   ├── ISSUES.md            # Issue tracker
-│   └── VERIFICATION.md      # This file
+│   └── ...
 ├── .env.example
 ├── LICENSE                  # MIT License
 └── README.md
@@ -75,26 +81,9 @@ slfn-business-os/
 - **Frontend**: React, TypeScript, TailwindCSS, Vite
 - **AI**: Ollama, Qwen2.5 models (Apache 2.0)
 - **Storage**: MinIO (S3-compatible)
-- **All dependencies are open source**
-
-### Ports Reference (QIR-Optimized)
-| Service | Host Port | Purpose |
-|---------|-----------|---------|
-| Backend | 8105 | Avoids conflict with SLFN Nexus AI (8102/8103) |
-| Frontend | 3001 | Standard dev port |
-| PostgreSQL | 5432 | Standard port |
-| Redis | 6379 | Standard port |
-| MinIO | 9000/9001 | S3 storage |
-| Ollama | 11434 | AI service |
-| Nginx | 8080 | Reverse proxy |
 
 ### Next Steps
 1. `cd slfn-business-os && docker-compose up -d`
 2. `docker-compose exec backend python -m alembic upgrade head`
-3. Access Frontend: http://localhost:3001
-4. Access API Docs: http://localhost:8105/docs
-
-### Workflow Applied
-- **Matt Pocock Senior Engineer Workflow**: grill-session → to-prd → to-issues → implement → tdd → code-review
-- **Quantum-Inspired Reasoning**: Superposition, Entanglement, Annealing
-- **Small-batch commits**: Each change is a small, reviewable commit
+3. Access Frontend: http://localhost:3002
+4. Access API Docs: http://localhost:8081/docs
