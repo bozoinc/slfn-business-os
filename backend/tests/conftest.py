@@ -4,8 +4,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 from app.main import app
-from app.db.session import Base
+from app.db.session import Base, get_db
 
 # Test database URL
 TEST_DATABASE_URL = "sqlite:///./test.db"
@@ -41,7 +42,7 @@ def db_session(test_db):
 def client(db_session):
     """Create test client with database session"""
     
-    def get_test_db():
+    def get_test_db() -> Session:
         try:
             yield db_session
         finally:
