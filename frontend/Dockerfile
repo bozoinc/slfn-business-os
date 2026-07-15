@@ -2,9 +2,9 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
+# Install all dependencies (including dev for build)
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -12,7 +12,7 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production image
+# Production image - only serve built files
 FROM nginx:alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
