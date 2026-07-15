@@ -46,7 +46,7 @@ This project replicates the core functionality of HighLevel (https://www.gohighl
 
 ### Infrastructure
 - **Containerization**: Docker
-- **Orchestration**: docker-compose
+- **Orchestration**: Docker Compose (v2)
 - **Storage**: MinIO (S3-compatible)
 
 ## Project Structure
@@ -80,7 +80,7 @@ slfn-business-os/
 ## Getting Started
 
 ### Prerequisites
-- Docker + Docker Compose
+- Docker + Docker Compose v2
 - Python 3.12+
 - Node.js 18+
 - Make (optional)
@@ -91,13 +91,13 @@ slfn-business-os/
 # Navigate to project
 cd slfn-business-os
 
-# Start all services
-docker-compose up -d
+# Start all services (Docker Compose v2 uses 'docker compose')
+docker compose up -d
 
 # Wait for database to be ready (30-60 seconds)
 
 # Run database migrations
-docker-compose exec backend python -m alembic upgrade head
+docker compose exec backend python -m alembic upgrade head
 
 # Access the application
 # Frontend: http://localhost:3002
