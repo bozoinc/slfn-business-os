@@ -1,0 +1,27 @@
+# Core dependencies
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+redis>=5.0.0
+pydantic-settings>=2.0.0
+
+# Database
+alembic>=1.13.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+
+# Utilities
+python-multipart>=0.0.6
+python-dotenv>=1.0.0
+
+# AI Integration
+httpx>=0.25.0
+# Note: Using local models, so no heavy ML libraries needed in the main requirements
