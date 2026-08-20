@@ -1,6 +1,6 @@
 """Database models for SLFN Nexus Platform"""
 
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Table, JSON
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Table, JSON, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -159,3 +159,99 @@ class FormSubmission(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     form = relationship("Form")
+
+
+class Phase(Base):
+    """Business growth phase model (Foundation → Growth → Scale → Enterprise → Fortune 500)"""
+
+    __tablename__ = "phases"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String, nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    order = Column(Integer, nullable=False, unique=True)
+    is_active = Column(Boolean, default=True)
+
+    checklists = relationship("Checklist", back_populates="phase", order_by="Checklist.order")
+    milestones = relationship("Milestone", back_populates="phase")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Checklist(Base):
+    """Checklist model for phase-specific tasks"""
+
+    __tablename__ = "checklists"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    phase_id = Column(String, ForeignKey("phases.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    order = Column(Integer, nullable=False)
+    is_required = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
+
+    phase = relationship("Phase", back_populates="checklists")
+    items = relationship("ChecklistItem", back_populates="checklist", order_by="ChecklistItem.order")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class ChecklistItem(Base):
+    """Individual checklist item"""
+
+    __tablename__ = "checklist_items"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    checklist_id = Column(String, ForeignKey("checklists.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    order = Column(Integer, nullable=False)
+    is_required = Column(Boolean, default=True)
+
+    checklist = relationship("Checklist", back_populates="items")
+    user_progress = relationship("UserProgress", back_populates="checklist_item")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Milestone(Base):
+    """Milestone model for phase completion markers"""
+
+    __tablename__ = "milestones"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    phase_id = Column(String, ForeignKey("phases.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    criteria = Column(JSON, default=dict)  # JSON criteria for auto-completion check
+    order = Column(Integer, nullable=False)
+
+    phase = relationship("Phase", back_populates="milestones")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class UserProgress(Base):
+    """User progress tracking for checklists and phases"""
+
+    __tablename__ = "user_progress"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("contacts.id"), nullable=False)  # Using Contact as user
+    checklist_item_id = Column(String, ForeignKey("checklist_items.id"), nullable=False)
+    phase_id = Column(String, ForeignKey("phases.id"), nullable=False)
+    is_completed = Column(Boolean, default=False)
+    completed_at = Column(DateTime, nullable=True)
+    notes = Column(Text, nullable=True)
+
+    user = relationship("Contact")
+    checklist_item = relationship("ChecklistItem", back_populates="user_progress")
+    phase = relationship("Phase")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

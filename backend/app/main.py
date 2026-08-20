@@ -6,7 +6,7 @@ An open-source alternative to HighLevel
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import health, contacts, deals, forms
+from app.api.routes import health, contacts, deals, forms, auth, guidance
 from app.core.config import settings
 
 @asynccontextmanager
@@ -40,3 +40,4 @@ app.include_router(contacts.router, prefix="/api/v1", tags=["contacts"])
 app.include_router(deals.router, prefix="/api/v1", tags=["deals"])
 app.include_router(forms.router, prefix="/api/v1", tags=["forms"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(guidance.router, prefix="/api/v1", tags=["guidance"])
