@@ -340,3 +340,58 @@ class PhaseWithDetailsResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# Document Intake Pipeline Schemas
+
+class DocumentResponse(BaseModel):
+    """Document response schema"""
+    id: str
+    filename: str
+    original_filename: str
+    content_type: str
+    file_size: Optional[int] = None
+    minio_object_name: Optional[str] = None
+    extracted_text: Optional[str] = None
+    extracted_metadata: Dict[str, Any] = {}
+    status: str
+    error_message: Optional[str] = None
+    uploaded_by: Optional[str] = None
+    phase_id: Optional[str] = None
+    checklist_id: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    processed_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class DocumentCreate(BaseModel):
+    """Document creation schema (for metadata-only creation)"""
+    original_filename: str
+    content_type: str = "application/pdf"
+    file_size: Optional[int] = None
+    minio_object_name: Optional[str] = None
+    uploaded_by: Optional[str] = None
+    phase_id: Optional[str] = None
+    checklist_id: Optional[str] = None
+
+
+class DocumentUpdate(BaseModel):
+    """Document update schema"""
+    filename: Optional[str] = None
+    extracted_text: Optional[str] = None
+    extracted_metadata: Optional[Dict[str, Any]] = None
+    status: Optional[str] = None
+    error_message: Optional[str] = None
+    phase_id: Optional[str] = None
+    checklist_id: Optional[str] = None
+
+
+class DocumentUploadResponse(BaseModel):
+    """Document upload response schema"""
+    document_id: str
+    filename: str
+    status: str
+    message: str

@@ -255,3 +255,37 @@ class UserProgress(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class Document(Base):
+    """Document model for PDF intake pipeline"""
+
+    __tablename__ = "documents"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    filename = Column(String, nullable=False)
+    original_filename = Column(String, nullable=False)
+    content_type = Column(String, default="application/pdf")
+    file_size = Column(Integer, nullable=True)
+    minio_object_name = Column(String, nullable=True)  # For MinIO storage
+    
+    # Extracted content
+    extracted_text = Column(Text, nullable=True)
+    extracted_metadata = Column(JSON, default=dict)  # PDF metadata, page count, etc.
+    
+    # Processing status
+    status = Column(String, default="pending")  # pending, processing, completed, failed
+    error_message = Column(Text, nullable=True)
+    
+    # Association
+    uploaded_by = Column(String, ForeignKey("contacts.id"), nullable=True)
+    phase_id = Column(String, ForeignKey("phases.id"), nullable=True)
+    checklist_id = Column(String, ForeignKey("checklists.id"), nullable=True)
+    
+    uploader = relationship("Contact")
+    phase = relationship("Phase")
+    checklist = relationship("Checklist")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    processed_at = Column(DateTime, nullable=True)
