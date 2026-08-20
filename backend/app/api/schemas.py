@@ -164,3 +164,179 @@ class FormSubmissionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# Guidance Engine Schemas
+
+class PhaseResponse(BaseModel):
+    """Phase response schema"""
+    id: str
+    name: str
+    description: Optional[str] = None
+    order: int
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PhaseCreate(BaseModel):
+    """Phase creation schema"""
+    name: str
+    description: Optional[str] = None
+    order: int
+
+
+class PhaseUpdate(BaseModel):
+    """Phase update schema"""
+    name: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+    is_active: Optional[bool] = None
+
+
+class ChecklistItemResponse(BaseModel):
+    """Checklist item response schema"""
+    id: str
+    checklist_id: str
+    title: str
+    description: Optional[str] = None
+    order: int
+    is_required: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ChecklistItemCreate(BaseModel):
+    """Checklist item creation schema"""
+    title: str
+    description: Optional[str] = None
+    order: int
+    is_required: bool = True
+
+
+class ChecklistItemUpdate(BaseModel):
+    """Checklist item update schema"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+    is_required: Optional[bool] = None
+
+
+class ChecklistResponse(BaseModel):
+    """Checklist response schema"""
+    id: str
+    phase_id: str
+    title: str
+    description: Optional[str] = None
+    order: int
+    is_required: bool
+    is_active: bool
+    items: List[ChecklistItemResponse] = []
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ChecklistCreate(BaseModel):
+    """Checklist creation schema"""
+    phase_id: str
+    title: str
+    description: Optional[str] = None
+    order: int
+    is_required: bool = True
+
+
+class ChecklistUpdate(BaseModel):
+    """Checklist update schema"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+    is_required: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+
+class MilestoneResponse(BaseModel):
+    """Milestone response schema"""
+    id: str
+    phase_id: str
+    title: str
+    description: Optional[str] = None
+    criteria: Dict[str, Any]
+    order: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class MilestoneCreate(BaseModel):
+    """Milestone creation schema"""
+    phase_id: str
+    title: str
+    description: Optional[str] = None
+    criteria: Optional[Dict[str, Any]] = None
+    order: int
+
+
+class MilestoneUpdate(BaseModel):
+    """Milestone update schema"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    criteria: Optional[Dict[str, Any]] = None
+    order: Optional[int] = None
+
+
+class UserProgressResponse(BaseModel):
+    """User progress response schema"""
+    id: str
+    user_id: str
+    checklist_item_id: str
+    phase_id: str
+    is_completed: bool
+    completed_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserProgressCreate(BaseModel):
+    """User progress creation schema"""
+    user_id: str
+    checklist_item_id: str
+    phase_id: str
+    is_completed: bool = False
+    notes: Optional[str] = None
+
+
+class UserProgressUpdate(BaseModel):
+    """User progress update schema"""
+    is_completed: Optional[bool] = None
+    notes: Optional[str] = None
+
+
+class PhaseWithDetailsResponse(BaseModel):
+    """Phase response with nested checklists and milestones"""
+    id: str
+    name: str
+    description: Optional[str] = None
+    order: int
+    is_active: bool
+    checklists: List[ChecklistResponse] = []
+    milestones: List[MilestoneResponse] = []
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

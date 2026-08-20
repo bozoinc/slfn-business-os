@@ -28,7 +28,7 @@ target_metadata = Base.metadata
 # can be acquired here.
 # Maybe we want to use environment variables here.
 def get_url():
-    return os.environ.get('DATABASE_URL', 'postgresql://hl_user:***@localhost:5432/hl_nexus')
+    return os.environ.get('DATABASE_URL', 'postgresql://slfn:slfn-pass@localhost:5433/slfn_business_os')
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
