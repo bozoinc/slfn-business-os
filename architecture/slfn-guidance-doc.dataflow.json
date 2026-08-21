@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "SLFN Business OS — Guidance Engine + Document Intake Data Flow",
+    "subtitle": "How data moves through phases, checklists, and document processing",
+    "output": "slfn-guidance-doc-dataflow.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "guidance-flow", "label": "Guidance Engine Flow", "focus": ["user", "frontend", "backend", "db", "phase", "checklist", "milestone"], "note": "User progresses through phases via checklists and milestones." },
+      { "id": "document-flow", "label": "Document Intake Pipeline", "focus": ["user", "frontend", "backend", "minio", "pdf-inspector", "db"], "note": "PDF upload → MinIO storage → background processing → extracted content." }
+    ]
+  },
+  "stages": [
+    { "label": "User Interaction" },
+    { "label": "API Layer" },
+    { "label": "Guidance Services" },
+    { "label": "Document Pipeline" },
+    { "label": "Storage" }
+  ],
+  "nodes": [
+    { "id": "user", "type": "external", "label": "User", "sublabel": "SLFN Member", "stage": 0, "row": 1 },
+    { "id": "frontend", "type": "frontend", "label": "React Frontend", "sublabel": "Port 3002", "stage": 1, "row": 1 },
+    { "id": "backend", "type": "backend", "label": "FastAPI Backend", "sublabel": "Port 8081", "stage": 1, "row": 2 },
+    { "id": "phase", "type": "backend", "label": "Phase Service", "sublabel": "Guidance phases", "stage": 2, "row": 0 },
+    { "id": "checklist", "type": "backend", "label": "Checklist Service", "sublabel": "Items & progress", "stage": 2, "row": 1 },
+    { "id": "milestone", "type": "backend", "label": "Milestone Service", "sublabel": "Completion gates", "stage": 2, "row": 2 },
+    { "id": "minio", "type": "cloud", "label": "MinIO", "sublabel": "Document storage", "stage": 3, "row": 0 },
+    { "id": "pdf-inspector", "type": "backend", "label": "PDF Inspector", "sublabel": "Background worker", "stage": 3, "row": 1 },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Business data + docs", "stage": 4, "row": 1 },
+    { "id": "doc-extracted", "type": "database", "label": "Extracted Content", "sublabel": "Text + metadata", "stage": 4, "row": 2 }
+  ],
+  "flows": [
+    { "id": "user-frontend", "from": "user", "to": "frontend", "label": "HTTPS", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "frontend-backend", "from": "frontend", "to": "backend", "label": "REST API", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-phase", "from": "backend", "to": "phase", "label": "Get phases", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-checklist", "from": "backend", "to": "checklist", "label": "Get checklists", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-milestone", "from": "backend", "to": "milestone", "label": "Check milestones", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-db", "from": "backend", "to": "db", "label": "CRUD + Progress", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "phase-checklist", "from": "phase", "to": "checklist", "label": "Has many", "variant": "default", "route": "straight" },
+    { "id": "checklist-milestone", "from": "checklist", "to": "milestone", "label": "Triggers", "variant": "default", "route": "straight" },
+    { "id": "user-upload", "from": "user", "to": "frontend", "label": "Upload PDF", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "frontend-upload", "from": "frontend", "to": "backend", "label": "POST /documents/upload", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-minio", "from": "backend", "to": "minio", "label": "Store PDF", "variant": "dashed", "fromSide": "right", "toSide": "left" },
+    { "id": "backend-queue", "from": "backend", "to": "pdf-inspector", "label": "Queue processing", "variant": "dashed", "fromSide": "right", "toSide": "left" },
+    { "id": "pdf-minio", "from": "pdf-inspector", "to": "minio", "label": "Read PDF", "variant": "dashed", "route": "straight" },
+    { "id": "pdf-extract", "from": "pdf-inspector", "to": "doc-extracted", "label": "Extract text + metadata", "variant": "emphasis", "route": "straight" },
+    { "id": "extracted-db", "from": "doc-extracted", "to": "db", "label": "Save extracted", "variant": "dashed", "fromSide": "left", "toSide": "right" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Guidance Engine", "items": ["5 phases: Foundation → Growth → Scale → Enterprise → Fortune 500", "Checklists with items per phase", "Milestones as completion gates", "User progress tracking (upsert)"] },
+    { "dot": "emerald", "title": "Document Pipeline", "items": ["PDF upload via REST API", "MinIO S3-compatible storage", "Background PDF Inspector worker", "Extracted text + metadata saved to DB", "Phase/checklist association"] },
+    { "dot": "amber", "title": "Data Flow", "items": ["User → Frontend → Backend → Services", "All state persisted in PostgreSQL", "Documents in MinIO, content in DB", "Async processing via queue"] }
+  ]
+}

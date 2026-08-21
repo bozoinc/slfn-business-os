@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "SLFN Business OS — Authentik OIDC Authentication Flow",
+    "subtitle": "SSO login with OIDC redirect, token validation, and user provisioning",
+    "output": "slfn-authentik-oidc-sequence.html",
+    "quality_profile": "showcase",
+    "visual_preset": "signal-flow",
+    "animation": "trace",
+    "viewBox": [820, 760],
+    "views": [
+      { "id": "oidc-redirect", "label": "OIDC Redirect Flow", "focus": ["user", "frontend", "backend", "authentik"], "note": "Browser-based OIDC authorization code flow with Authentik." },
+      { "id": "token-validation", "label": "Backend Token Validation", "focus": ["backend", "authentik", "db"], "note": "JWKS validation, user info fetch, local user provisioning." }
+    ]
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "User", "sublabel": "Browser" },
+    { "id": "frontend", "type": "frontend", "label": "React", "sublabel": "Port 3002" },
+    { "id": "backend", "type": "backend", "label": "FastAPI", "sublabel": "Port 8081" },
+    { "id": "authentik", "type": "security", "label": "Authentik", "sublabel": "OIDC Provider" },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Business DB" }
+  ],
+  "segments": [
+    { "from": 120, "to": 350, "label": "OIDC Authorization" },
+    { "from": 370, "to": 540, "label": "Token Exchange & Validation" },
+    { "from": 560, "to": 680, "label": "User Provisioning" }
+  ],
+  "messages": [
+    { "from": "user", "to": "frontend", "y": 160, "label": "Clicks \"SSO with Authentik\"", "variant": "emphasis" },
+    { "from": "frontend", "to": "backend", "y": 190, "label": "GET /auth/authentik/login", "variant": "default" },
+    { "from": "backend", "to": "frontend", "y": 220, "label": "302 → Authentik /authorize", "variant": "return" },
+    { "from": "frontend", "to": "authentik", "y": 250, "label": "OIDC Authorization Request", "variant": "emphasis" },
+    { "from": "authentik", "to": "user", "y": 290, "label": "Login + MFA Challenge", "variant": "security" },
+    { "from": "user", "to": "authentik", "y": 330, "label": "Credentials + MFA", "variant": "security" },
+    { "from": "authentik", "to": "frontend", "y": 370, "label": "302 → /callback?code=...", "variant": "return" },
+    { "from": "frontend", "to": "backend", "y": 420, "label": "GET /callback?code=...", "variant": "emphasis" },
+    { "from": "backend", "to": "authentik", "y": 440, "label": "POST /token (code exchange)", "variant": "emphasis" },
+    { "from": "authentik", "to": "backend", "y": 470, "label": "access_token + id_token", "variant": "return" },
+    { "from": "backend", "to": "authentik", "y": 500, "label": "GET /userinfo", "variant": "default" },
+    { "from": "authentik", "to": "backend", "y": 530, "label": "User claims (sub, email)", "variant": "return" },
+    { "from": "backend", "to": "db", "y": 560, "label": "Upsert user (provision)", "variant": "emphasis" },
+    { "from": "db", "to": "backend", "y": 590, "label": "User record", "variant": "return" },
+    { "from": "backend", "to": "frontend", "y": 620, "label": "302 → /dashboard?token=...", "variant": "return" },
+    { "from": "frontend", "to": "user", "y": 650, "label": "Dashboard loaded", "variant": "emphasis" }
+  ],
+  "activations": [
+    { "participant": "frontend", "from": 140, "to": 650, "type": "frontend" },
+    { "participant": "backend", "from": 170, "to": 630, "type": "backend" },
+    { "participant": "authentik", "from": 230, "to": 530, "type": "security" },
+    { "participant": "db", "from": 540, "to": 590, "type": "database" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "OIDC Authorization Code Flow", "items": ["Frontend initiates → Backend generates Authentik URL", "User authenticates on Authentik (MFA if enforced)", "Authentik redirects back with authorization code", "Backend exchanges code for tokens at /token endpoint"] },
+    { "dot": "rose", "title": "Security Boundaries", "items": ["Authentik handles all credentials & MFA", "Backend never sees user password", "JWT validation via Authentik JWKS", "id_token contains verified user claims"] },
+    { "dot": "emerald", "title": "User Provisioning", "items": ["Backend fetches userinfo from Authentik", "Upserts into local PostgreSQL (Contacts table)", "Links Authentik subject (sub) to local user", "Generates local JWT for API access"] }
+  ]
+}

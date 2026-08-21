@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SLFN Business OS — Current Architecture",
+    "subtitle": "FastAPI + React + PostgreSQL + Redis + MinIO on Docker Compose",
+    "output": "slfn-current-rendered.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "request-path", "label": "Primary request path", "focus": ["users", "frontend", "backend", "db"], "note": "Follow the primary customer request from browser to durable state." },
+      { "id": "storage-and-cache", "label": "Storage and cache layer", "focus": ["backend", "redis", "minio"], "note": "Isolate the cache and object storage beside the API." },
+      { "id": "guidance-and-docs", "label": "Guidance + Document flow", "focus": ["backend", "db", "minio"], "note": "See how guidance engine and document intake share the data layer." }
+    ]
+  },
+  "layout": { "mode": "grid", "origin": [0, 0], "cols": 12, "gapX": 40, "gapY": 30, "cellW": 140, "cellH": 80 },
+  "components": [
+    { "id": "users", "type": "external", "label": "Users", "sublabel": "Browser / Mobile", "row": 1, "col": 1 },
+    { "id": "frontend", "type": "frontend", "label": "React Frontend", "sublabel": "Port 3002", "row": 1, "col": 3, "tag": "Vite + TS" },
+    { "id": "backend", "type": "backend", "label": "FastAPI Backend", "sublabel": "Port 8081", "row": 1, "col": 6, "tag": "Python 3.12" },
+    { "id": "db", "type": "database", "label": "PostgreSQL 15", "sublabel": "Port 5433", "row": 1, "col": 9 },
+    { "id": "redis", "type": "database", "label": "Redis 7", "sublabel": "Port 6380", "row": 2, "col": 6 },
+    { "id": "minio", "type": "cloud", "label": "MinIO", "sublabel": "Port 9002/9003", "row": 2, "col": 9, "tag": "S3-compatible" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "SLFN Business OS Network", "wraps": ["frontend", "backend", "db", "redis", "minio"], "pad": 20 }
+  ],
+  "connections": [
+    { "id": "users-to-frontend", "from": "users", "to": "frontend", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "frontend-to-backend", "from": "frontend", "to": "backend", "label": "REST API" },
+    { "id": "backend-to-db", "from": "backend", "to": "db", "label": "SQL (asyncpg)", "labelAt": [1224, 184] },
+    { "id": "backend-to-redis", "from": "backend", "to": "redis", "label": "Cache / Sessions", "labelAt": [1140, 184] },
+    { "id": "backend-to-minio", "from": "backend", "to": "minio", "label": "S3 API", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Frontend", "items": ["React 18 + TypeScript", "Vite dev server", "Port 3002 (nginx in prod)"] },
+    { "dot": "emerald", "title": "Backend", "items": ["FastAPI + SQLAlchemy 2.0", "Alembic migrations", "JWT auth (bcrypt)", "Port 8081"] },
+    { "dot": "amber", "title": "Data Layer", "items": ["PostgreSQL 15 on 5433", "Redis 7 on 6380", "MinIO on 9002/9003"] },
+    { "dot": "rose", "title": "Auth (Current)", "items": ["Local JWT + bcrypt", "Contacts table as users", "Ready for Authentik OIDC"] }
+  ]
+}

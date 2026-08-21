@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SLFN Business OS — Target Architecture",
+    "subtitle": "Full stack with Authentik OIDC, Airllm, PDF Inspector, Aether local AI",
+    "output": "slfn-target-rendered.html",
+    "quality_profile": "standard",
+    "visual_preset": "classic",
+    "views": [
+      { "id": "overview", "label": "System Overview", "focus": ["users", "frontend", "backend", "db", "authentik", "airllm", "aether", "pdf-inspector"], "note": "Complete target architecture with all planned integrations." }
+    ]
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "Users", "sublabel": "Browser / Mobile", "pos": [100, 300], "size": [140, 70] },
+    { "id": "frontend", "type": "frontend", "label": "React Frontend", "sublabel": "Port 3002", "pos": [300, 300], "size": [160, 70], "tag": "Vite + TS" },
+    { "id": "backend", "type": "backend", "label": "FastAPI Backend", "sublabel": "Port 8081", "pos": [540, 300], "size": [160, 70], "tag": "Python 3.12" },
+    { "id": "db", "type": "database", "label": "PostgreSQL 15", "sublabel": "Port 5433 (business)", "pos": [780, 300], "size": [160, 70] },
+    { "id": "redis", "type": "database", "label": "Redis 7", "sublabel": "Port 6380", "pos": [780, 180], "size": [160, 70] },
+    { "id": "minio", "type": "cloud", "label": "MinIO", "sublabel": "Port 9002/9003", "pos": [780, 420], "size": [160, 70], "tag": "S3-compatible" },
+    { "id": "authentik", "type": "security", "label": "Authentik", "sublabel": "Port 9000/9443", "pos": [300, 100], "size": [160, 70], "tag": "OIDC Provider" },
+    { "id": "authentik-db", "type": "database", "label": "PostgreSQL 15", "sublabel": "Port 5434 (authentik)", "pos": [540, 100], "size": [160, 70] },
+    { "id": "authentik-redis", "type": "database", "label": "Redis 7", "sublabel": "Port 6381", "pos": [780, 100], "size": [160, 70] },
+    { "id": "airllm", "type": "backend", "label": "Airllm", "sublabel": "Port 8100", "pos": [1020, 180], "size": [160, 70], "tag": "LLM Inference" },
+    { "id": "aether", "type": "backend", "label": "Aether", "sublabel": "Port 8502", "pos": [1020, 300], "size": [160, 70], "tag": "Local AI Agent" },
+    { "id": "pdf-inspector", "type": "backend", "label": "PDF Inspector", "sublabel": "Background Worker", "pos": [1020, 420], "size": [160, 70], "tag": "PDF Processing" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "SLFN Business OS", "wraps": ["frontend", "backend", "db", "redis", "minio", "authentik", "authentik-db", "authentik-redis", "airllm", "aether", "pdf-inspector"], "pad": 30 },
+    { "kind": "security-group", "label": "Authentik Zone", "wraps": ["authentik", "authentik-db", "authentik-redis"], "pad": 20 }
+  ],
+  "connections": [
+    { "id": "users-frontend", "from": "users", "to": "frontend", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "frontend-backend", "from": "frontend", "to": "backend", "label": "REST API" },
+    { "id": "backend-db", "from": "backend", "to": "db", "label": "SQL (asyncpg)" },
+    { "id": "backend-redis", "from": "backend", "to": "redis", "label": "Cache / Sessions" },
+    { "id": "backend-minio", "from": "backend", "to": "minio", "label": "S3 API", "variant": "dashed" },
+    { "id": "frontend-authentik", "from": "frontend", "to": "authentik", "label": "OIDC Redirect", "variant": "security" },
+    { "id": "backend-authentik", "from": "backend", "to": "authentik", "label": "Token Validation", "variant": "security" },
+    { "id": "authentik-db", "from": "authentik", "to": "authentik-db", "label": "SQL" },
+    { "id": "authentik-redis", "from": "authentik", "to": "authentik-redis", "label": "Cache" },
+    { "id": "backend-airllm", "from": "backend", "to": "airllm", "label": "Inference API", "variant": "dashed" },
+    { "id": "backend-aether", "from": "backend", "to": "aether", "label": "Agent API", "variant": "dashed" },
+    { "id": "backend-pdf", "from": "backend", "to": "pdf-inspector", "label": "Process Queue", "variant": "dashed" },
+    { "id": "pdf-minio", "from": "pdf-inspector", "to": "minio", "label": "Read/Write", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Frontend", "items": ["React 18 + TypeScript", "Vite dev server", "Port 3002"] },
+    { "dot": "emerald", "title": "Backend", "items": ["FastAPI + SQLAlchemy 2.0", "Alembic migrations", "JWT + Authentik OIDC", "Port 8081"] },
+    { "dot": "amber", "title": "Data Layer", "items": ["PostgreSQL 15 (business) :5433", "PostgreSQL 15 (authentik) :5434", "Redis 7 :6380/:6381", "MinIO :9002/:9003"] },
+    { "dot": "rose", "title": "Identity", "items": ["Authentik OIDC Provider", "SSO + MFA ready", "User provisioning"] },
+    { "dot": "violet", "title": "AI Layer", "items": ["Airllm :8100 — LLM inference", "Aether :8502 — Local AI agent", "PDF Inspector — Background processing"] }
+  ]
+}
