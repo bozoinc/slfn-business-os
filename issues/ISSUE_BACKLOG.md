@@ -16,14 +16,14 @@
 | 001 | Fix PostgreSQL Authentication Failure | BLOCKER | 1 | ✅ DONE |
 | 002 | CORS Configuration for Frontend-Backend | BLOCKER | 1 | ✅ DONE |
 | 003 | Sandbox Deployment Recovery Model | HIGH | 1 | ✅ DONE |
-| 004 | Business OS Core Guidance Engine | HIGH | 3-4 | 📋 TODO |
-| 005 | Document Intake Pipeline with PDF Processing | MEDIUM | 2-3 | 📋 TODO |
-| 006 | Authentik SSO Integration | HIGH | 3-4 | 📋 TODO |
-| 007 | Architecture Documentation with archify-mapper | MEDIUM | 1-2 | 📋 TODO |
+|| 004 | Business OS Core Guidance Engine | HIGH | 3-4 | ✅ DONE |
+|| 005 | Document Intake Pipeline with PDF Processing | MEDIUM | 2-3 | ✅ DONE |
+|| 006 | Authentik SSO Integration | HIGH | 3-4 | ✅ DONE |
+|| 007 | Architecture Documentation with archify-mapper | MEDIUM | 1-2 | ✅ DONE |
 | 008 | Aether Integration for Local AI Inference | MEDIUM | 2-3 | 📋 TODO |
 
 ## Next Action
-Run `/implement issue-003-sandbox-recovery.md` to establish the development workflow foundation.
+Run `/implement issue-008-aether-integration.md` to add local AI inference via Aether.
 
 ## Notes
 - Issues 001 & 002 are complete (verified working)
