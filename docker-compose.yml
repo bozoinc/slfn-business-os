@@ -43,9 +43,13 @@ services:
       redis:
         condition: service_started
     environment:
-      - DATABASE_URL=postgresql://slfn:***@db:5432/slfn_business_os
+      - DATABASE_URL=postgresql://slfn:slfn-pass@db:5432/slfn_business_os
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=change-this-in-production
+      - AUTHENTIK_URL=http://localhost:9000
+      - AUTHENTIK_CLIENT_ID=6S8KcTVwB0euO1owAmU1y1XRLcTVoJCLkGdhCa9b
+      - AUTHENTIK_CLIENT_SECRET=xY5agRJieDMHDdlGEUkHLt6ZATbp8bUiJOd6ZDd0jfnPBsaGtdQUPGqYQgYDJMWabgHFa9yaFDwYxmpX84RADVJqu4pFSK2uiNZqTcx0V4nkDBYUKQK6hKXbWtfTbOEv
+      - AUTHENTIK_REALM=slfn-business-os
     ports:
       - "8081:8000"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000

@@ -100,7 +100,7 @@ class AuthentikOIDC:
             "state": state,
         }
         query = "&".join(f"{k}={v}" for k, v in params.items())
-        return f"{self.base_url}/application/o/{self.realm}/authorize/?{query}"
+        return f"{self.base_url}/application/o/authorize/?{query}"
 
 
 # Global instance

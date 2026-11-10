@@ -40,3 +40,5 @@ logs/
 # Ignore database files
 *.sqlite3
 *.db
+# Don't ignore hermes metadata
+!.hermes/

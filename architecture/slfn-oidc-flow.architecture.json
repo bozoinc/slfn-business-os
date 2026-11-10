@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "SLFN Business OS — OIDC Authentication Flow",
+    "subtitle": "High-level architecture with Authentik OIDC integration",
+    "output": "slfn-oidc-flow-rendered.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "overview", "label": "System Overview", "focus": ["users", "browser", "frontend", "backend", "authentik", "authentik-db", "authentik-redis", "app-db", "minio"], "note": "Complete system with Authentik OIDC integration" },
+      { "id": "oidc-zone", "label": "Auth & Identity", "focus": ["users", "browser", "frontend", "backend", "authentik", "authentik-db", "authentik-redis"], "note": "OIDC authentication components" },
+      { "id": "app-zone", "label": "Business OS Core", "focus": ["frontend", "backend", "app-db", "minio"], "note": "Application services and data layer" }
+    ]
+  },
+  "layout": { "mode": "grid", "origin": [0, 0], "cols": 10, "gapX": 50, "gapY": 40, "cellW": 160, "cellH": 90 },
+  "components": [
+    { "id": "users", "type": "external", "label": "Users", "sublabel": "Browser / Mobile", "row": 1, "col": 1 },
+    { "id": "browser", "type": "frontend", "label": "Browser", "sublabel": "User Agent", "row": 1, "col": 2 },
+    { "id": "frontend", "type": "frontend", "label": "React Frontend", "sublabel": "Port 3002", "tag": "Vite + TS", "row": 1, "col": 4 },
+    { "id": "backend", "type": "backend", "label": "FastAPI Backend", "sublabel": "Port 8081", "tag": "Python 3.12", "row": 1, "col": 7 },
+    { "id": "authentik", "type": "security", "label": "Authentik OIDC", "sublabel": "Port 9000", "tag": "Go/Django", "row": 1, "col": 10 },
+    { "id": "authentik-db", "type": "database", "label": "Authentik PG", "sublabel": "Port 5434", "row": 2, "col": 10 },
+    { "id": "authentik-redis", "type": "database", "label": "Authentik Redis", "sublabel": "Port 6381", "row": 2, "col": 11 },
+    { "id": "app-db", "type": "database", "label": "App PostgreSQL", "sublabel": "Port 5433", "row": 2, "col": 7 },
+    { "id": "minio", "type": "cloud", "label": "MinIO S3", "sublabel": "Port 9002/9003", "tag": "S3-compatible", "row": 2, "col": 4 }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "SLFN Business OS Network", "wraps": ["frontend", "backend", "app-db", "minio"], "pad": 25 },
+    { "kind": "region", "label": "Authentik Zone", "wraps": ["authentik", "authentik-db", "authentik-redis"], "pad": 25 }
+  ],
+  "connections": [
+    { "id": "c1", "from": "users", "to": "browser", "label": "HTTPS" },
+    { "id": "c2", "from": "browser", "to": "frontend", "label": "React SPA" },
+    { "id": "c3", "from": "frontend", "to": "authentik", "label": "1. OIDC Authorize", "fromSide": "right", "toSide": "left" },
+    { "id": "c4", "from": "authentik", "to": "browser", "label": "2. Login Page", "fromSide": "left", "toSide": "right" },
+    { "id": "c5", "from": "browser", "to": "authentik", "label": "3. Credentials", "fromSide": "right", "toSide": "left" },
+    { "id": "c6", "from": "authentik", "to": "authentik-db", "label": "Verify User", "fromSide": "bottom", "toSide": "top" },
+    { "id": "c7", "from": "authentik", "to": "browser", "label": "4. Consent", "fromSide": "left", "toSide": "right" },
+    { "id": "c8", "from": "browser", "to": "authentik", "label": "5. Grant Consent", "fromSide": "right", "toSide": "left" },
+    { "id": "c9", "from": "authentik", "to": "browser", "label": "6. Auth Code", "fromSide": "left", "toSide": "right" },
+    { "id": "c10", "from": "browser", "to": "frontend", "label": "7. Callback", "fromSide": "left", "toSide": "right" },
+    { "id": "c11", "from": "frontend", "to": "backend", "label": "8. Token Exchange", "fromSide": "right", "toSide": "left" },
+    { "id": "c12", "from": "backend", "to": "authentik", "label": "9. Code → Tokens", "fromSide": "right", "toSide": "left" },
+    { "id": "c13", "from": "authentik", "to": "authentik-db", "label": "Validate Code", "fromSide": "bottom", "toSide": "top" },
+    { "id": "c14", "from": "authentik", "to": "backend", "label": "10. Tokens", "fromSide": "left", "toSide": "right" },
+    { "id": "c15", "from": "backend", "to": "authentik", "label": "11. UserInfo", "fromSide": "right", "toSide": "left" },
+    { "id": "c16", "from": "backend", "to": "app-db", "label": "12. Provision User", "fromSide": "bottom", "toSide": "top" },
+    { "id": "c17", "from": "backend", "to": "browser", "label": "13. Local JWT", "fromSide": "left", "toSide": "right" },
+    { "id": "c18", "from": "browser", "to": "frontend", "label": "14. Dashboard", "fromSide": "left", "toSide": "right" },
+    { "id": "c19", "from": "backend", "to": "authentik", "label": "15. JWKS (cached)", "fromSide": "right", "toSide": "left" },
+    { "id": "c20", "from": "backend", "to": "app-db", "label": "API Queries", "fromSide": "bottom", "toSide": "top", "variant": "dashed" },
+    { "id": "c21", "from": "backend", "to": "minio", "label": "Documents", "fromSide": "left", "toSide": "right", "variant": "dashed" },
+    { "id": "c22", "from": "backend", "to": "authentik-redis", "label": "Cache/Sessions", "fromSide": "bottom", "toSide": "top", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Frontend", "items": ["React 18 + TypeScript", "Vite dev server", "Port 3002", "Authentik SSO button"] },
+    { "dot": "emerald", "title": "Backend", "items": ["FastAPI + SQLAlchemy 2.0", "JWT + OIDC validation", "Authentik token exchange", "Port 8081"] },
+    { "dot": "amber", "title": "Data Layer", "items": ["PostgreSQL 15 on 5433", "Redis 7 on 6380", "MinIO on 9002/9003"] },
+    { "dot": "rose", "title": "Authentik OIDC", "items": ["Provider: slfn-business-os", "Client ID: 6S8KcTVwB0eu...", "Realm: slfn-business-os", "RS256 JWKS endpoint"] },
+    { "dot": "violet", "title": "OIDC Flow", "items": ["Authorization Code grant", "Confidential client", "Implicit consent", "Scopes: openid,email,profile"] }
+  ]
+}

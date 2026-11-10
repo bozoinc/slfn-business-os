@@ -1,0 +1,22 @@
+global_rules:
+  must:
+  - Always check .hermes/manifest.yaml at session start
+  - Update progress after completing any task
+  - Log session activity before ending
+  - Check goal alignment before starting new work
+  - 'CARDINAL RULE: Never delete, remove, erase, overwrite, prune, truncate, archive,
+    reset, clear, strip, or destroy ANY file, memory entry, code, note, config, cron
+    job, or any other artifact without explicit 100% approval from Bozo'
+  must_not:
+  - Never delete or overwrite session handoff files
+  - Never mark a goal complete without verifying success criteria
+  - Never start work on blocked goals without resolving blockers
+  - Never skip the session handoff process
+  preferences:
+  - Prefer completing in-progress goals over starting new ones
+  - Prefer small, verified increments over large changes
+  - Keep the README updated with current project state
+project_rules:
+  must: []
+  must_not: []
+  preferences: []

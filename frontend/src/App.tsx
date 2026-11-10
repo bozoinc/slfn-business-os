@@ -14,32 +14,40 @@ import Login from './pages/Login'
 import MainLayout from './components/layout/MainLayout'
 
 // Auth
-import { useAuth } from './hooks/useAuth'
+import { AuthProvider, useAuth } from './hooks/useAuth'
 
 const queryClient = new QueryClient()
 
-function App() {
+function AppRoutes() {
   const { isAuthenticated } = useAuth()
 
   return (
+    <Routes>
+      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+
+      <Route element={isAuthenticated ? <MainLayout /> : <Navigate to="/login" replace />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="/contacts" element={<Contacts />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/forms" element={<Forms />} />
+        <Route path="/settings" element={<Settings />} />
+      </Route>
+    </Routes>
+  )
+}
+
+function App() {
+  return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="min-h-screen bg-background">
-          <Routes>
-            <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-            
-            <Route element={isAuthenticated ? <MainLayout /> : <Navigate to="/login" />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/deals" element={<Deals />} />
-              <Route path="/forms" element={<Forms />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
-          </Routes>
-          
-          <Toaster position="bottom-right" />
-        </div>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <AppRoutes />
+            <Toaster position="bottom-right" />
+          </div>
+        </Router>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

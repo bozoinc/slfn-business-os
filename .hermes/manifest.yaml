@@ -1,0 +1,38 @@
+project:
+  id: proj_slfn-nexus
+  name: SLFN Nexus
+  codename: slfn-nexus
+  description: 'SLFN business OS: AF v2 (8100), GraphForge v0.2.3, CRM (3002/8081),
+    Marketing Stack'
+  created: '2026-11-10T19:37:19.986192'
+  last_active: '2026-11-10T19:37:19.986198'
+  status: active
+  priority: high
+  complexity: high
+  sessions_spent: 0
+  repo_url: https://github.com/bozoinc/slfn-nexus
+goals:
+  primary:
+    description: Launch SLFN Business OS v2 with all modules integrated
+    success_criteria: []
+  subgoals: []
+rules:
+  must: []
+  must_not: []
+  preferences: []
+context:
+  tech_stack:
+  - TypeScript
+  - React
+  - Node.js
+  - PostgreSQL
+  - Docker
+  key_decisions: []
+  dependencies: []
+  resources: []
+progress:
+  overall_percent: 60
+  current_phase: development
+  completed_milestones: []
+  blocking_issues: []
+session_log: []

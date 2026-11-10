@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Authentik Identity Provider
   authentik:
-    image: ghcr.io/goauthentik/server:2025.8.3
+    image: ghcr.io/goauthentik/server:latest
     container_name: slfn-authentik
     restart: unless-stopped
     command: server
@@ -14,15 +14,16 @@ services:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-this-in-production}
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_LOG_LEVEL: info
-      # Database
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: authentik
-      POSTGRES_USER: authentik
-      POSTGRES_PASSWORD: authentik-pass
+      # Database - use AUTHENTIK_ prefix as expected by authentik config loader
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__PORT: "5432"
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik-pass
       # Redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__PORT: "6379"
+      AUTHENTIK_REDIS__DB: "0"
       # Email (configure for production)
       AUTHENTIK_EMAIL__HOST: localhost
       AUTHENTIK_EMAIL__PORT: 25
@@ -43,7 +44,7 @@ services:
       - authentik_media:/media
       - authentik_templates:/templates
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/health/ready/"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/-/health/ready/', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -51,7 +52,7 @@ services:
 
   # Authentik Worker
   authentik-worker:
-    image: ghcr.io/goauthentik/server:2025.8.3
+    image: ghcr.io/goauthentik/server:latest
     container_name: slfn-authentik-worker
     restart: unless-stopped
     command: worker
@@ -62,15 +63,16 @@ services:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-change-this-in-production}
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_LOG_LEVEL: info
-      # Database
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: authentik
-      POSTGRES_USER: authentik
-      POSTGRES_PASSWORD: authentik-pass
+      # Database - use AUTHENTIK_ prefix as expected by authentik config loader
+      AUTHENTIK_POSTGRESQL__HOST: db
+      AUTHENTIK_POSTGRESQL__PORT: "5432"
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik-pass
       # Redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__PORT: "6379"
+      AUTHENTIK_REDIS__DB: "0"
     depends_on:
       db:
         condition: service_healthy
@@ -82,7 +84,7 @@ services:
       - authentik_media:/media
       - authentik_templates:/templates
 
-  # PostgreSQL for Authentik (shared with Business OS)
+  # PostgreSQL for Authentik
   db:
     image: postgres:15-alpine
     container_name: slfn-authentik-db
@@ -101,7 +103,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis for Authentik (shared with Business OS)
+  # Redis for Authentik
   redis:
     image: redis:7-alpine
     container_name: slfn-authentik-redis
@@ -115,6 +117,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  default:
+    external: true
+    name: slfn-business-os_default
 
 volumes:
   authentik_db_data:

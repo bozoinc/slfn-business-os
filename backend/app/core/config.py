@@ -20,9 +20,9 @@ class Settings(BaseSettings):
 
     # Authentik OIDC
     AUTHENTIK_URL: str = "http://localhost:9000"
-    AUTHENTIK_CLIENT_ID: str = ""
-    AUTHENTIK_CLIENT_SECRET: str = ""
-    AUTHENTIK_REALM: str = "slfn"
+    AUTHENTIK_CLIENT_ID: str = "6S8KcTVwB0euO1owAmU1y1XRLcTVoJCLkGdhCa9b"
+    AUTHENTIK_CLIENT_SECRET: str = "xY5agRJieDMHDdlGEUkHLt6ZATbp8bUiJOd6ZDd0jfnPBsaGtdQUPGqYQgYDJMWabgHFa9yaFDwYxmpX84RADVJqu4pFSK2uiNZqTcx0V4nkDBYUKQK6hKXbWtfTbOEv"
+    AUTHENTIK_REALM: str = "slfn-business-os"
 
     # CORS
     ALLOWED_ORIGINS: List[str] = [

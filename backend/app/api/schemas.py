@@ -22,9 +22,9 @@ class ContactResponse(BaseModel):
     country: Optional[str] = None
     custom_fields: Dict[str, Any] = {}
     tags: List[str] = []
-    created_at: datetime
-    updated_at: datetime
-    is_active: bool
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    is_active: Optional[bool] = None
 
     class Config:
         from_attributes = True

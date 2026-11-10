@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -17,6 +17,7 @@ RUN mkdir -p /etc/nginx/conf.d/ && \
     echo '        root /usr/share/nginx/html;' >> /etc/nginx/conf.d/default.conf && \
     echo '        index index.html;' >> /etc/nginx/conf.d/default.conf && \
     echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/conf.d/default.conf && \
+    echo '        add_header Cache-Control "no-store, no-cache, must-revalidate";' >> /etc/nginx/conf.d/default.conf && \
     echo '    }' >> /etc/nginx/conf.d/default.conf && \
     echo '' >> /etc/nginx/conf.d/default.conf && \
     echo '    location /api/ {' >> /etc/nginx/conf.d/default.conf && \
